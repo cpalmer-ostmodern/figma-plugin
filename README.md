@@ -1,4 +1,4 @@
-# Plugin
+# POST API Plugin
 
 ## Development guide
 

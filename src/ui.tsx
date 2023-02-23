@@ -4,65 +4,79 @@ import {
   Button,
   Container,
   render,
+  Textbox,
   VerticalSpace,
-  FileUploadButton,
 } from "@create-figma-plugin/ui";
-import { emit } from "@create-figma-plugin/utilities";
 import { h } from "preact";
 import { useCallback, useState } from "preact/hooks";
 import { highlight, languages } from "prismjs";
 import Editor from "react-simple-code-editor";
 import styles from "./styles.css";
-import { InsertCodeHandler } from "./types";
 
 function Plugin() {
-  const [code, setCode] = useState(`insert JSON file here`);
+  const [tokens, setTokens] = useState(`insert JSON file here`);
+  const [endpoint, setEndpoint] = useState("http://api.endpoint/example");
+  const [response, setResponse] = useState(`no tokens received.`);
+
+  const handleAPI = (e: any) => {
+    e.preventDefault();
+    setEndpoint(e.target.value);
+  };
+
   const handleInsertCodeButtonClick = useCallback(
     async function () {
-      let body = JSON.stringify({
-        title: "foo",
-        body: "bar",
-        userId: 1,
-      });
+      let body = tokens;
       let request = new XMLHttpRequest();
-      // This link has random lorem ipsum text
-      request.open("POST", "https://jsonplaceholder.typicode.com/posts", true);
-      request.setRequestHeader('Content-type', 'application/json');
+      
+      request.open("POST", endpoint, true);
+      request.setRequestHeader("Content-type", "application/json");
+      request.setRequestHeader("Accept", "*/*");
       request.onreadystatechange = function () {
         //Call a function when the state changes.
         if (request.readyState == 4 && request.status == 200) {
-          alert(request.responseText);
+          alert('API request successful');
         }
       };
       request.send(body);
-      request.responseType = "json";
+      request.responseType = "text";
       request.onload = () => {
-        console.log(request.response);
+        // console.log(request.response);
+        if (request.status === 200) {
+          setResponse("sucess !");
+        }
+        setResponse('API POST successful.');
       };
-      let data = await request.send();
-      return data;
     },
-    [code]
+    [tokens, response, endpoint]
   );
   return (
-    <Container space="medium">
+    <Container space="large">
       <VerticalSpace space="small" />
+      Enter API URL below:
+      <br></br>
+            <Textbox 
+              onChange={(e) => handleAPI(e)}
+              value={endpoint}
+            ></Textbox>
+      <VerticalSpace space="small" />
+      <VerticalSpace space="medium" />
       <div class={styles.container}>
         <Editor
-          highlight={function (code: string) {
-            return highlight(code, languages.js, "js");
+          highlight={function (tokens: string) {
+            return highlight(tokens, languages.js, "js");
           }}
-          onValueChange={setCode}
+          onValueChange={setTokens}
           preClassName={styles.editor}
           textareaClassName={styles.editor}
-          value={code}
+          value={tokens}
         />
       </div>
       <VerticalSpace space="large" />
+      {response}
       <Button fullWidth onClick={handleInsertCodeButtonClick}>
         Send To API
       </Button>
-      <VerticalSpace space="small" />
+      <VerticalSpace space="small"></VerticalSpace>
     </Container>
   );
 }
