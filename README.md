@@ -46,3 +46,7 @@ Official docs and code samples from Figma:
 
 - [Plugin API docs](https://figma.com/plugin-docs/)
 - [`figma/plugin-samples`](https://github.com/figma/plugin-samples#readme)
+
+## Development Tools
+
+- [CORS Anywhere](https://cors-anywhere.herokuapp.com/corsdemo)
